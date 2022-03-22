@@ -71,7 +71,7 @@ Future<void> runServer() async {
       .addMiddleware(corsHeaders(headers: overrideHeaders))
       .addHandler(app);
 
-  final server = await io.serve(handler, 'localhost', 8080);
+  final server = await io.serve(handler, 'localhost', 8724);
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
