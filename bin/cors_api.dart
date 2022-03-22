@@ -6,10 +6,11 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:http/http.dart' as http;
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.1.0 beta";
+const version = "0.2.0 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer() async {
@@ -60,7 +61,17 @@ Future<void> runServer() async {
     }
   });
   final security = SecurityContext.defaultContext;
-  final server = await io.serve(app, 'localhost', 8080);
+
+  final overrideHeaders = {
+    ACCESS_CONTROL_ALLOW_ORIGIN: '*',
+    'Content-Type': 'application/json;charset=utf-8'
+  };
+
+  final handler = Pipeline()
+      .addMiddleware(corsHeaders(headers: overrideHeaders))
+      .addHandler(app);
+
+  final server = await io.serve(handler, 'localhost', 8080);
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
