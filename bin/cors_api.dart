@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'api_cache.dart';
 
 const version = "0.1.0 beta";
+const identifier = "mwcors_server";
 
 Future<void> runServer() async {
   Map<String, APICacheRegistry> getMap = {};
@@ -17,6 +18,10 @@ Future<void> runServer() async {
 
   app.get('/version', (Request request) {
     return Response.ok(version);
+  });
+
+  app.get('/id', (Request request) {
+    return Response.ok(identifier);
   });
 
   // app.get('/user/<user>', (Request request, String user) {
