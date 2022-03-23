@@ -10,7 +10,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.4.1 beta";
+const version = "0.5.1 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -88,6 +88,9 @@ void main(List<String> arguments) {
   String? certificate;
   String? key;
   if (arguments.isNotEmpty) {
+    if (arguments[0].contains("--help")) {
+      help();
+    }
     port = int.tryParse(arguments[0]) ?? defaultPort;
   }
   if (arguments.length >= 3) {
@@ -105,6 +108,14 @@ void main(List<String> arguments) {
       print('Server Online! $port');
     });
   }
+}
+
+void help() {
+  print("for http:");
+  print("\tusage: ./cors_api.exe [port] ");
+  print("for https:");
+  print("\tusage: ./cors_api.exe [port] [certificate_path] [key_path]");
+  exit(1);
 }
 
 final String trendsUrl = "https://trends.gab.com/trend-feed/json";
