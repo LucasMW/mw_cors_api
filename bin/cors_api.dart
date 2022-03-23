@@ -10,10 +10,10 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.2.0 beta";
+const version = "0.4.0 beta";
 const identifier = "mwcors_server";
 
-Future<void> runServer(int port) async {
+Future<void> runServer(int port, {String? cert, String? key}) async {
   Map<String, APICacheRegistry> getMap = {};
   final app = Router();
 
@@ -24,10 +24,6 @@ Future<void> runServer(int port) async {
   app.get('/id', (Request request) {
     return Response.ok(identifier);
   });
-
-  // app.get('/user/<user>', (Request request, String user) {
-  //   return Response.ok('hello $user');
-  // });
 
   app.get('/teapot', (Request request) {
     final body = """ 
@@ -71,7 +67,15 @@ Future<void> runServer(int port) async {
       .addMiddleware(corsHeaders(headers: overrideHeaders))
       .addHandler(app);
 
-  final server = await io.serve(handler, InternetAddress.anyIPv4, port);
+  if (cert != null && key != null) {
+    security.useCertificateChain(cert);
+    security.usePrivateKey(key);
+  }
+
+  final server = await io.serve(handler, InternetAddress.anyIPv4, port,
+      securityContext: security);
+
+  print('Server Stopped! $server');
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
@@ -81,12 +85,26 @@ bool cacheTimeout(APICacheRegistry reg, Duration time) {
 void main(List<String> arguments) {
   const defaultPort = 8080;
   int port = defaultPort;
+  String? certificate;
+  String? key;
   if (arguments.isNotEmpty) {
     port = int.tryParse(arguments[0]) ?? defaultPort;
   }
-  runServer(port).then((_) {
-    print('Server Online! $port');
-  });
+  if (arguments.length >= 3) {
+    final certPath = arguments[1];
+    final keyPath = arguments[2];
+
+    certificate = certPath;
+    key = keyPath;
+
+    runServer(port, cert: certificate, key: key).then((_) {
+      print('Server Online https! $port');
+    });
+  } else {
+    runServer(port).then((_) {
+      print('Server Online! $port');
+    });
+  }
 }
 
 final String trendsUrl = "https://trends.gab.com/trend-feed/json";
