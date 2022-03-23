@@ -13,7 +13,7 @@ import 'api_cache.dart';
 const version = "0.2.0 beta";
 const identifier = "mwcors_server";
 
-Future<void> runServer() async {
+Future<void> runServer(int port) async {
   Map<String, APICacheRegistry> getMap = {};
   final app = Router();
 
@@ -71,7 +71,7 @@ Future<void> runServer() async {
       .addMiddleware(corsHeaders(headers: overrideHeaders))
       .addHandler(app);
 
-  final server = await io.serve(handler, 'localhost', 3002);
+  final server = await io.serve(handler, 'localhost', port);
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
@@ -79,8 +79,13 @@ bool cacheTimeout(APICacheRegistry reg, Duration time) {
 }
 
 void main(List<String> arguments) {
-  runServer().then((_) {
-    print('Server Online!');
+  const defaultPort = 8080;
+  int port = defaultPort;
+  if (arguments.isNotEmpty) {
+    port = int.tryParse(arguments[0]) ?? defaultPort;
+  }
+  runServer(port).then((_) {
+    print('Server Online! $port');
   });
 }
 
