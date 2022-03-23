@@ -10,7 +10,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.4.0 beta";
+const version = "0.4.1 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -27,7 +27,7 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
 
   app.get('/teapot', (Request request) {
     final body = """ 
-        <html> <body> <a href = "http://menezesworks.com"> I am a teapot! </a> </body> </html>
+        <html> <body> <a href = "https://menezesworks.com"> I am a teapot! </a> </body> </html>
     """;
     print(request.context);
     final x = request.context["shelf.io.connection_info"] as HttpConnectionInfo;
