@@ -82,7 +82,7 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
   } else {
     final server = await io.serve(handler, InternetAddress.anyIPv4, port,
         securityContext: security);
-    final serverDebug = await io.serve(handler, 'localhost', port);
+    final serverDebug = await io.serve(handler, 'localhost', port + 1);
   }
 
   print('Server created!');
