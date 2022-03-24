@@ -10,7 +10,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.5.1 beta";
+const version = "0.6.1 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -41,6 +41,12 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
     final result = await getJsonString(trendsUrl);
     return Response.ok(result, headers: {"content-type": "text/json"});
   });
+
+  app.get("/liturgy", (Request request) async {
+    final result = await getJsonString(liturgyUrl);
+    return Response.ok(result, headers: {"content-type": "text/json"});
+  });
+
   app.get("/getjson/<url>", (Request request, String url) async {
     print(url);
     final uri = Uri.parse("https://$url");
@@ -74,8 +80,9 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
 
   final server = await io.serve(handler, InternetAddress.anyIPv4, port,
       securityContext: security);
+  //final server2 = await io.serve(handler, InternetAddress.anyIPv4, port + 1);
 
-  print('Server Stopped! $server');
+  print('Server created! ${server.serverHeader}');
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
@@ -119,6 +126,8 @@ void help() {
 }
 
 final String trendsUrl = "https://trends.gab.com/trend-feed/json";
+final String liturgyUrl =
+    "http://calapi.inadiutorium.cz/api/v0/en/calendars/default/today";
 
 Future<String> getJsonString(String str) async {
   final url = Uri.parse(str);
