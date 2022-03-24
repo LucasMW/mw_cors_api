@@ -10,7 +10,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'api_cache.dart';
 
-const version = "0.6.1 beta";
+const version = "0.7.0 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -77,12 +77,15 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
     security.useCertificateChain(cert);
     security.usePrivateKey(key);
   }
+  if (debug) {
+    final server = await io.serve(handler, 'localhost', port);
+  } else {
+    final server = await io.serve(handler, InternetAddress.anyIPv4, port,
+        securityContext: security);
+    final serverDebug = await io.serve(handler, 'localhost', port);
+  }
 
-  final server = await io.serve(handler, InternetAddress.anyIPv4, port,
-      securityContext: security);
-  //final server2 = await io.serve(handler, InternetAddress.anyIPv4, port + 1);
-
-  print('Server created! ${server.serverHeader}');
+  print('Server created!');
 }
 
 bool cacheTimeout(APICacheRegistry reg, Duration time) {
@@ -128,6 +131,7 @@ void help() {
 final String trendsUrl = "https://trends.gab.com/trend-feed/json";
 final String liturgyUrl =
     "http://calapi.inadiutorium.cz/api/v0/en/calendars/default/today";
+const bool debug = false;
 
 Future<String> getJsonString(String str) async {
   final url = Uri.parse(str);
