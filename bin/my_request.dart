@@ -15,8 +15,8 @@ class ProxyHttpRequest {
   ProxyHttpRequest.fromJson(Map<String, dynamic> json) {
     method = json['method'];
     url = json['url'];
-    body = json['body'];
-    headers = json['headers'] as Map<String, String>;
+    body = json['body'] ?? {};
+    headers = json['headers'] ?? {};
   }
 
   Map<String, dynamic> toJson() {

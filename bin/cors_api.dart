@@ -10,7 +10,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'api_cache.dart';
 import 'my_request.dart';
 
-const version = "0.8.5 beta";
+const version = "0.9.0 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -78,6 +78,7 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
   app.post('/json', (Request request) async {
     final obj = await request.body.asJson;
     final str = obj.toString();
+    print(str);
     final userRequest = ProxyHttpRequest.fromJson(obj);
     if (userRequest.method.toLowerCase() == "get") {
       final result = await getJsonStringCached(userRequest.url, genericCache);
@@ -126,7 +127,8 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
     final server = await io.serve(handler, 'localhost', port);
     print("DEBUG MODE");
   } else {
-    final server = await io.serve(handler, InternetAddress.anyIPv4, port,
+    final server = await io.serve(handler,
+        useIpv6 ? InternetAddress.anyIPv6 : InternetAddress.anyIPv4, port,
         securityContext: security);
     final serverDebug = await io.serve(handler, 'localhost', port + 1);
   }
@@ -149,6 +151,9 @@ void main(List<String> arguments) {
     }
     if (arguments.contains("--debug")) {
       debug = true;
+    }
+    if (arguments.contains("--ipv6")) {
+      useIpv6 = true;
     }
     port = int.tryParse(arguments[0]) ?? defaultPort;
   }
@@ -187,6 +192,7 @@ String liturgicalCalendarUrl(int year) =>
     "http://calapi.inadiutorium.cz/api/v0/en/calendars/default/$year";
 
 late bool debug = false;
+late bool useIpv6 = false;
 
 Future<String> getJsonStringCached(String str, APICache cache) async {
   final response = await cache.get(str);
