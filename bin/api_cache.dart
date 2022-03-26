@@ -9,8 +9,10 @@ class APICacheRegistry {
 class APICache {
   Map<String, APICacheRegistry> getMap = {};
   Map<String, Map<String, APICacheRegistry>> postMap = {};
-
+  Duration duration;
   static const cacheDefaultTime = Duration(minutes: 2);
+
+  APICache({this.duration = cacheDefaultTime});
 
   Future<http.Response> get(String url, {Map<String, String>? headers}) async {
     final obj = getMap[url];
@@ -23,7 +25,7 @@ class APICache {
   }
 
   bool cacheTimeout(APICacheRegistry reg) {
-    return DateTime.now().difference(reg.timestamp) > cacheDefaultTime;
+    return DateTime.now().difference(reg.timestamp) > duration;
   }
 
   Future<http.Response> post(String url, String jsonEncodedBody,
