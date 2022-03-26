@@ -5,9 +5,13 @@ It also implements other non generic requests
 
 ## Running the server
 for http:
-        usage: ./cors_api.exe [port] 
+
+    usage: ./cors_api.exe [port]
+
 for https:
-        usage: ./cors_api.exe [port] [certificate_path] [key_path]
+
+    usage: ./cors_api.exe [port] [certificate_path] [key_path]
+
 use: --debug for enabling localhost
 
 ## Using the API
