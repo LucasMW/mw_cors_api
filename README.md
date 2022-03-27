@@ -1,6 +1,6 @@
 # MW_CORS_API Server
-Implements an API for proxying requests.
 
+Implements an API for proxying requests.
 It also implements other non generic requests
 
 ## Running the server
@@ -22,12 +22,14 @@ send request descriptor in the body
 #### for HTTP.GET:
     {
         "method" : "get",
-        "url" : "https://trends.gab.com/trend-feed/json"
+        "url" : "https://trends.gab.com/trend-feed/json",
+        "headers":  {:}
     }
 
 #### for HTTP.POST:
     {
         "method" : "get",
         "url" : "https://trends.gab.com/trend-feed/json",
-        "body": {...}
+        "body": {...},
+        "headers": {:}
     }
