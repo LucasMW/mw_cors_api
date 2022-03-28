@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class APICacheRegistry {
@@ -8,7 +10,7 @@ class APICacheRegistry {
 
 class APICache {
   Map<String, APICacheRegistry> getMap = {};
-  Map<String, Map<String, APICacheRegistry>> postMap = {};
+  Map<String, APICacheRegistry> postMap = {};
   Duration duration;
   static const cacheDefaultTime = Duration(minutes: 2);
 
@@ -30,11 +32,13 @@ class APICache {
 
   Future<http.Response> post(String url, String jsonEncodedBody,
       {Map<String, String>? headers}) async {
-    final obj = postMap[url]?[jsonEncodedBody];
+    final obj = postMap[url + jsonEncodedBody];
     if (obj == null || cacheTimeout(obj)) {
-      final resp = await http.post(Uri.parse(url),
-          body: jsonEncodedBody, headers: headers);
-      postMap[url]?[jsonEncodedBody] = APICacheRegistry(DateTime.now(), resp);
+      final decoder = JsonDecoder();
+      final body = decoder.convert(jsonEncodedBody);
+      final resp =
+          await http.post(Uri.parse(url), body: body, headers: headers);
+      postMap[url + jsonEncodedBody] = APICacheRegistry(DateTime.now(), resp);
       return resp;
     }
     return obj.response;

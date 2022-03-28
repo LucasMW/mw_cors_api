@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:shelf_router/shelf_router.dart';
@@ -10,7 +11,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'api_cache.dart';
 import 'my_request.dart';
 
-const version = "0.9.0 beta";
+const version = "0.10.0 beta";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
@@ -18,6 +19,7 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
   final liturgyCache = APICache(duration: Duration(hours: 1));
   final trendsCache = APICache(duration: Duration(hours: 1));
   final genericCache = APICache(duration: Duration(minutes: 5));
+  final genericPostCache = APICache(duration: Duration(minutes: 5));
   final app = Router();
 
   app.get('/version', (Request request) {
@@ -84,7 +86,8 @@ Future<void> runServer(int port, {String? cert, String? key}) async {
       final result = await getJsonStringCached(userRequest.url, genericCache);
       return Response.ok(result, headers: {"content-type": "text/json"});
     } else if (userRequest.method.toLowerCase() == "post") {
-      final result = await postJsonString(userRequest.url, userRequest.body);
+      final result = await postJsonStringCached(
+          userRequest.url, userRequest.body, genericPostCache);
       return Response.ok(result, headers: {"content-type": "text/json"});
     }
 
@@ -176,10 +179,13 @@ void main(List<String> arguments) {
 
 void help() {
   print("for http:");
-  print("\tusage: ./cors_api.exe [port] ");
+  print("\tusage: ./cors_api.exe [port] [flags] ");
   print("for https:");
-  print("\tusage: ./cors_api.exe [port] [certificate_path] [key_path]");
-  print("use: --debug for enabling localhost");
+  print("\tusage: ./cors_api.exe [port] [certificate_path] [key_path] [flags]");
+  print("flags:");
+  print("\tuse: --debug to enable localhost");
+  print("\tuse: --ipv6 to enable ipv6");
+  print("\tuse: --help to display this message");
   exit(1);
 }
 
@@ -208,5 +214,13 @@ Future<String> getJsonString(String str) async {
 Future<String> postJsonString(String str, Object? body) async {
   final url = Uri.parse(str);
   final response = await http.post(url, body: body);
+  return response.body;
+}
+
+Future<String> postJsonStringCached(
+    String str, Object? body, APICache cache) async {
+  final JsonEncoder encoder = JsonEncoder();
+  final encoded = encoder.convert(body);
+  final response = await cache.post(str, encoded);
   return response.body;
 }
