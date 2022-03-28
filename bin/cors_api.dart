@@ -11,7 +11,7 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'api_cache.dart';
 import 'my_request.dart';
 
-const version = "0.10.0 beta";
+const version = "1.0.0";
 const identifier = "mwcors_server";
 
 Future<void> runServer(int port, {String? cert, String? key}) async {
